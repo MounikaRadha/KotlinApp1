@@ -7,4 +7,6 @@
         <item>another page is used for saving emergency contact numbers</item>
         <item>another page is used to press button to do the needy like send sms current location,image capture and sending</item>
     </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
