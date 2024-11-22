@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MySecurity1</string>
+    <string name="app_about_string">            this app uses kotlin for devleopment \n one of the screen is used to noted down incidents and their emergency level \n another page is used for saving emergency contact numbers \n  another page is used to press button to do the needy like send sms \n \n \n  \n \n \n  \n \n \n ,current location,image capture and sending...</string>
 </resources>
