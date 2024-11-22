@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">MySecurity1</string>
     <string name="app_about_string">            this app uses kotlin for devleopment \n one of the screen is used to noted down incidents and their emergency level \n another page is used for saving emergency contact numbers \n  another page is used to press button to do the needy like send sms \n \n \n  \n \n \n  \n \n \n ,current location,image capture and sending...</string>
+    <string-array name="about_page_array">
+        <item> this app uses kotlin for development</item>
+        <item>one of the screen is used to noted down incidents and their emergency level</item>
+        <item>another page is used for saving emergency contact numbers</item>
+        <item>another page is used to press button to do the needy like send sms current location,image capture and sending</item>
+    </string-array>
 </resources>
