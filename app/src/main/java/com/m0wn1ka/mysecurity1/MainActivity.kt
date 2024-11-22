@@ -18,24 +18,23 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(activityMainBinding.root)
-//        val url:String="https:///m0wn1ka.github.io"
-//        val urlIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-//        startActivity(urlIntent)
         loadFragment1()
-//        activityMainBinding.AboutPageButton.setOnClickListener(){
-//            startActivity(Intent(applicationContext,AboutPage::class.java))
-//        }
-        activityMainBinding.buttonTab2.setOnClickListener(){
-            loadFragment2()
-        }
-        activityMainBinding.buttonTab1.setOnClickListener(){
-            loadFragment1()
-        }
+        activityMainBinding.buttonTab2.setOnClickListener(){ loadFragment2() }
+        activityMainBinding.buttonTab1.setOnClickListener(){ loadFragment3() }
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+    fun loadFragment3(){
+        //load the page `start using the app`
+        //the page shows users to save contact numbers and incidents
+        val fragmentManager: FragmentManager =supportFragmentManager
+        val fragmentTransaction: FragmentTransaction =fragmentManager.beginTransaction()
+        val clickTheButtonFragment=PreFeed()
+        fragmentTransaction.replace(R.id.frameLayout,clickTheButtonFragment)
+        fragmentTransaction.commit()
     }
     fun loadFragment2(){
         //loads the page which has click the button features
