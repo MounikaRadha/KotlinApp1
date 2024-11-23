@@ -1,8 +1,12 @@
 package com.m0wn1ka.mysecurity1
 
 import android.Manifest
+import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.telephony.SmsManager
@@ -12,12 +16,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.location.LocationManagerCompat.isLocationEnabled
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.m0wn1ka.mysecurity1.databinding.ActivityMainBinding
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -25,6 +32,8 @@ import kotlinx.coroutines.runBlocking
 
 class MainActivity : AppCompatActivity() {
     lateinit var activityMainBinding: ActivityMainBinding
+//    lateinit  var mFusedLocationClient: FusedLocationProviderClient
+//     lateinit var location:Location
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -33,6 +42,7 @@ class MainActivity : AppCompatActivity() {
         loadFragment1()
         activityMainBinding.buttonTab2.setOnClickListener(){ loadFragment2() }
         activityMainBinding.buttonTab1.setOnClickListener(){ loadFragment3() }
+//        mFusedLocationClient=  LocationServices.getFusedLocationProviderClient(this)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -51,6 +61,7 @@ class MainActivity : AppCompatActivity() {
     fun loadFragment2(){
         //ask for sms permissions
         requestSmsPermission()
+        requestLocationPermission()
         //loads the page which has click the button features
         val fragmentManager: FragmentManager =supportFragmentManager
         val fragmentTransaction: FragmentTransaction =fragmentManager.beginTransaction()
@@ -129,18 +140,26 @@ class MainActivity : AppCompatActivity() {
 
         return contactNumbers
     }
-
-
     private fun isSmsPermissionGranted(): Boolean {
         return ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED
     }
-
-    // Function to request permission
+    private fun isLocationPermissionGranted(): Boolean {
+        return ContextCompat.checkSelfPermission(applicationContext,Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+    }
     private fun requestSmsPermission() {
         if (!isSmsPermissionGranted()) {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.SEND_SMS),
+                101
+            )
+        }
+    }
+    private fun requestLocationPermission(){
+        if(!isLocationPermissionGranted()){
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 101
             )
         }
@@ -154,13 +173,14 @@ class MainActivity : AppCompatActivity() {
 
         if (requestCode == 101) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                Toast.makeText(this, "SMS permission given.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, " permission given.", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, "SMS permission denied.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, " permission denied.", Toast.LENGTH_SHORT).show()
             }
         }
     }
-    public fun sendMessages(incidentName: String,context: Context){
+    @SuppressLint("MissingPermission")
+    public fun sendMessages(incidentName: String, context: Context){
         try {
         val smsManager: SmsManager =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -168,19 +188,28 @@ class MainActivity : AppCompatActivity() {
         } else {
             SmsManager.getDefault()
         }
-       lifecycleScope.launch {
-           var contacts= retrieveContacts()
-           for(contact in contacts){
-               smsManager.sendTextMessage(contact,null,incidentName,null,null)
-               Toast.makeText(context,"send msg to "+contact,Toast.LENGTH_SHORT)
-               Log.d("sms","sms of"+contact)
-           }
-        }
+            var location:String= "test location"
+            var   mFusedLocationClient=  LocationServices.getFusedLocationProviderClient(context)
+            mFusedLocationClient.lastLocation.addOnCompleteListener(this) { task ->
+                location = task.result.toString()
+                lifecycleScope.launch {
+                    var contacts= retrieveContacts()
+                    for(contact in contacts){
+                        var message1="start:";
+                        message1+=  location
+                        message1+=incidentName
+                        Log.d("location","mesasage is"+message1)
+                        smsManager.sendTextMessage(contact,null,message1,null,null)
+                        Toast.makeText(context,"send msg to "+contact,Toast.LENGTH_SHORT)
+                        Log.d("sms","sms of"+contact)
+                    }
+                }
+            }
        }
         catch (e:Exception){
             Toast.makeText(context,e.message,Toast.LENGTH_SHORT)
         }
-
     }
+
 
 }
