@@ -1,12 +1,15 @@
 package com.m0wn1ka.mysecurity1
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+
 internal class ClickTheButtonAdapter(
     private val context: Context,
     private val incidentNames: Array<String>,
@@ -42,6 +45,12 @@ internal class ClickTheButtonAdapter(
         incidentName = convertView.findViewById(R.id.incidentName)
         incidentImage.setImageResource(incidentImages[position])
         incidentName.text = incidentNames[position]
+        convertView.setOnClickListener(){
+//            Toast.makeText(context, incidentNames[position], Toast.LENGTH_LONG).show()
+            val clickTheButton=ClickTheButton();
+            clickTheButton.clickButtonListner(incidentNames[position],context)
+            Log.d("adapter",incidentNames[position])
+        }
         return convertView
     }
 }

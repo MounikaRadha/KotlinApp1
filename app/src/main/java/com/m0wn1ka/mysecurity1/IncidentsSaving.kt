@@ -45,8 +45,8 @@ class IncidentsSaving : AppCompatActivity() {
         saveIncident(incidentlevelNumber,incidentName)
         Toast.makeText(this, "incident saved", Toast.LENGTH_SHORT).show()
     }
-    private suspend fun retrieveIncidents(): MutableList<String> {
-        val incidents: MutableList<String> = ArrayList()
+     suspend fun retrieveIncidents(): ArrayList<String> {
+        val incidents: ArrayList<String> = ArrayList()
         try {
             val preferences =dataStore.data.first()
 
