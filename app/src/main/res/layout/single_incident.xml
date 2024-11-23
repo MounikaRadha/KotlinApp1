@@ -18,7 +18,7 @@
         android:layout_marginTop="16dp"
         android:text="Numbers"
         android:layout_marginBottom="10dp"
-        android:textColor="@android:color/background_dark"
+
         android:textSize="24sp"
         android:textStyle="bold" />
 </LinearLayout>
