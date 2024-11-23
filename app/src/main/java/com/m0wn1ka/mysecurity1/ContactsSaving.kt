@@ -2,20 +2,20 @@ package com.m0wn1ka.mysecurity1
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.lifecycleScope
 import com.m0wn1ka.mysecurity1.databinding.ActivityContactsSavingBinding
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 val AppCompatActivity.dataStore by preferencesDataStore(name = "contact_numbers")
@@ -26,7 +26,7 @@ class ContactsSaving : AppCompatActivity() {
         enableEdgeToEdge()
         contactsSavingBinding=ActivityContactsSavingBinding.inflate(getLayoutInflater())
         setContentView(contactsSavingBinding.root)
-        lifecycleScope.launch { showUpdatedEmergencyContactList() }
+        lifecycleScope.launch { saveDummyContact();showUpdatedEmergencyContactList() }
         contactsSavingBinding.SaveContactButton.setOnClickListener(){
             getAndSaveContact()
         }
@@ -46,34 +46,42 @@ class ContactsSaving : AppCompatActivity() {
         val contactLevelNumber:Int=contactsSavingBinding.LevelOfContact.text.toString().toInt()
         saveContact(contactLevelNumber,contactNumber)
         Toast.makeText(this, "contact saved", Toast.LENGTH_SHORT).show()
-        lifecycleScope.launch {
-            showUpdatedEmergencyContactList();
-        }
-
     }
-
-    private suspend fun retrieveContacts():MutableList<String>{
+    private suspend fun retrieveContacts(): MutableList<String> {
         val contactNumbers: MutableList<String> = ArrayList()
         try {
+            val preferences =dataStore.data.first()
+
             for (level in 1..3) {
-                val key_of_contact = stringPreferencesKey(level.toString() + " :person")
-                val contactsData = dataStore.data.first()
-                val contactNumber = contactsData[key_of_contact]
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-                    contactNumbers.addFirst(contactNumber)
-                };
-                else {
-                    if (contactNumber != null) {
-                        contactNumbers.add(-1, contactNumber)
-                    }
-                    Toast.makeText(this, "unsupported versoin", Toast.LENGTH_SHORT).show()
+                val keyOfContact =stringPreferencesKey("$level :person")
+                val contactNumber =preferences[keyOfContact]
+                if (contactNumber!= null) {
+                    contactNumbers.add(contactNumber)
+                } else {
+                    Log.d("retrieveContacts", "No contact found for level $level")
                 }
             }
+            val dummyKey =stringPreferencesKey("dummyKey")
+            val dummy = preferences[dummyKey] ?: "Default Dummy Contact"
+            contactNumbers.add(dummy)
+        } catch (e: Exception) {
+            Log.e("retrieveContacts", "Error retrieving contacts: ${e.message}")
+            runOnUiThread {
+                Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+            }
         }
-        catch ( e:Exception){
-            Toast.makeText(this,e.message.toString(),Toast.LENGTH_LONG).show()
-        }
+
         return contactNumbers
+    }
+
+    private fun saveDummyContact(){
+        lifecycleScope.launch{
+            val dummyKey= stringPreferencesKey("dummyKey")
+            dataStore.edit { preferences->
+                preferences[dummyKey]="123123123"
+            }
+
+        }
     }
     private fun saveContact(level:Int,contactNumber:String) {
         val Key_of_contact = stringPreferencesKey(level.toString()+" :person")
@@ -81,6 +89,7 @@ class ContactsSaving : AppCompatActivity() {
             dataStore.edit { preferences ->
                 preferences[Key_of_contact] = contactNumber
             }
+            showUpdatedEmergencyContactList();
         }
     }
 }
