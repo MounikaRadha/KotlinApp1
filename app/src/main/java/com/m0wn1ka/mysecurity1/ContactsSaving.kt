@@ -78,9 +78,8 @@ class ContactsSaving : AppCompatActivity() {
         lifecycleScope.launch{
             val dummyKey= stringPreferencesKey("dummyKey")
             dataStore.edit { preferences->
-                preferences[dummyKey]="123123123"
+                preferences[dummyKey]="test incident"
             }
-
         }
     }
     private fun saveContact(level:Int,contactNumber:String) {

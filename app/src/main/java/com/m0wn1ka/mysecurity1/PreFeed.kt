@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.Button
 
 class PreFeed : Fragment() {
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -19,6 +18,12 @@ class PreFeed : Fragment() {
         saveContactsButton.setOnClickListener(){
             if (container != null) {
                 startActivity(Intent(container.context, ContactsSaving::class.java))
+            }
+        }
+        var saveIncidentsButton:Button=view.findViewById(R.id.IncidentsButton)
+        saveIncidentsButton.setOnClickListener(){
+            if(container!=null){
+                startActivity(Intent(container.context,IncidentsSaving::class.java))
             }
         }
         return view
