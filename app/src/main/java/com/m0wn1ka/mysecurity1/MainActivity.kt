@@ -1,17 +1,26 @@
 package com.m0wn1ka.mysecurity1
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.telephony.SmsManager
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.lifecycleScope
 import com.m0wn1ka.mysecurity1.databinding.ActivityMainBinding
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class MainActivity : AppCompatActivity() {
@@ -40,6 +49,8 @@ class MainActivity : AppCompatActivity() {
         fragmentTransaction.commit()
     }
     fun loadFragment2(){
+        //ask for sms permissions
+        requestSmsPermission()
         //loads the page which has click the button features
         val fragmentManager: FragmentManager =supportFragmentManager
         val fragmentTransaction: FragmentTransaction =fragmentManager.beginTransaction()
@@ -118,4 +129,59 @@ class MainActivity : AppCompatActivity() {
 
         return contactNumbers
     }
+
+
+    private fun isSmsPermissionGranted(): Boolean {
+        return ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED
+    }
+
+    // Function to request permission
+    private fun requestSmsPermission() {
+        if (!isSmsPermissionGranted()) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.SEND_SMS),
+                101
+            )
+        }
+    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == 101) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                Toast.makeText(this, "SMS permission given.", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "SMS permission denied.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    public fun sendMessages(incidentName: String,context: Context){
+
+        try {
+        val smsManager: SmsManager =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            context.getSystemService(SmsManager::class.java)
+        } else {
+            SmsManager.getDefault()
+        }
+       lifecycleScope.launch {
+           var contacts= retrieveContacts()
+           for(contact in contacts){
+               smsManager.sendTextMessage(contact,null,incidentName,null,null)
+               Toast.makeText(context,"send msg to "+contact,Toast.LENGTH_SHORT)
+               Log.d("sms","sms of"+contact)
+           }
+        }
+       }
+        catch (e:Exception){
+            Toast.makeText(context,e.message,Toast.LENGTH_SHORT)
+        }
+
+    }
+
 }
