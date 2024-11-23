@@ -81,7 +81,9 @@ class MainActivity : AppCompatActivity() {
         val incidents: ArrayList<String> = ArrayList()
         try {
             val preferences =dataStore.data.first()
-
+            val dummyKey = stringPreferencesKey("dummyKey")
+            val dummy = preferences[dummyKey] ?: "Default Dummy incident"
+            incidents.add(dummy)
             for (level in 1..3) {
                 val keyOfIncident = stringPreferencesKey("$level :incident")
                 val incident =preferences[keyOfIncident]
@@ -91,9 +93,7 @@ class MainActivity : AppCompatActivity() {
                     Log.d("retrievIncidents", "No incident found for level $level")
                 }
             }
-            val dummyKey = stringPreferencesKey("dummyKey")
-            val dummy = preferences[dummyKey] ?: "Default Dummy incident"
-            incidents.add(dummy)
+
         } catch (e: Exception) {
             Log.e("retrieveIncidents", "Error retrieving incident: ${e.message}")
             runOnUiThread {
@@ -107,7 +107,9 @@ class MainActivity : AppCompatActivity() {
         val contactNumbers: ArrayList<String> = ArrayList()
         try {
             val preferences =dataStore.data.first()
-
+            val dummyKey =stringPreferencesKey("dummyKey")
+            val dummy = preferences[dummyKey] ?: "Default Dummy Contact"
+            contactNumbers.add(dummy)
             for (level in 1..3) {
                 val keyOfContact =stringPreferencesKey("$level :person")
                 val contactNumber =preferences[keyOfContact]
@@ -117,9 +119,7 @@ class MainActivity : AppCompatActivity() {
                     Log.d("retrieveContacts", "No contact found for level $level")
                 }
             }
-            val dummyKey =stringPreferencesKey("dummyKey")
-            val dummy = preferences[dummyKey] ?: "Default Dummy Contact"
-            contactNumbers.add(dummy)
+
         } catch (e: Exception) {
             Log.e("retrieveContacts", "Error retrieving contacts: ${e.message}")
             runOnUiThread {
@@ -161,7 +161,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
     public fun sendMessages(incidentName: String,context: Context){
-
         try {
         val smsManager: SmsManager =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

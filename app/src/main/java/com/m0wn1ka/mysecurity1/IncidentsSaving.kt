@@ -47,9 +47,12 @@ class IncidentsSaving : AppCompatActivity() {
     }
      suspend fun retrieveIncidents(): ArrayList<String> {
         val incidents: ArrayList<String> = ArrayList()
+
         try {
             val preferences =dataStore.data.first()
-
+            val dummyKey = stringPreferencesKey("dummyKey")
+            val dummy = preferences[dummyKey] ?: "Default Dummy Contact"
+            incidents.add(dummy)
             for (level in 1..3) {
                 val keyOfIncident = stringPreferencesKey("$level :incident")
                 val incident =preferences[keyOfIncident]
@@ -59,9 +62,7 @@ class IncidentsSaving : AppCompatActivity() {
                     Log.d("retrievIncidents", "No incident found for level $level")
                 }
             }
-            val dummyKey = stringPreferencesKey("dummyKey")
-            val dummy = preferences[dummyKey] ?: "Default Dummy Contact"
-            incidents.add(dummy)
+
         } catch (e: Exception) {
             Log.e("retrieveContacts", "Error retrieving contacts: ${e.message}")
             runOnUiThread {
