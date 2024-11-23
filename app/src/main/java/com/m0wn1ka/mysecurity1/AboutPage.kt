@@ -17,7 +17,6 @@ class AboutPage : AppCompatActivity() {
         enableEdgeToEdge()
         activityAboutPageBinding=ActivityAboutPageBinding.inflate(layoutInflater)
         setContentView(activityAboutPageBinding.AboutPageLayout)
-
         var arrayAdapter: ArrayAdapter<*>
         arrayAdapter=ArrayAdapter(this,android.R.layout.simple_list_item_1,resources.getStringArray(R.array.about_page_array))
         activityAboutPageBinding.AboutPageList.adapter = arrayAdapter
